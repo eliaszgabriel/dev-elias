@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* helpers simples */
+html,
+body,
+#root {
+  height: 100%;
+}
+html {
+  scroll-behavior: smooth;
+}
+html {
+  scroll-behavior: smooth;
+}
