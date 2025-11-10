@@ -40,3 +40,38 @@
 .read-the-docs {
   color: #888;
 }
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+    text-shadow:
+      0 0 6px rgba(126, 231, 247, 0.6),
+      0 0 12px rgba(126, 231, 247, 0.28);
+  }
+  50% {
+    opacity: 0.75;
+    text-shadow:
+      0 0 14px rgba(126, 231, 247, 0.9),
+      0 0 28px rgba(126, 231, 247, 0.45);
+  }
+}
+
+@keyframes sweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Respeita quem prefere menos movimento */
+@media (prefers-reduced-motion: reduce) {
+  .animate-\[blink_1\.8s_ease-in-out_infinite\] {
+    animation: none;
+  }
+  .before\:animate-\[sweep_3\.8s_linear_infinite\]::before {
+    animation: none;
+  }
+}
