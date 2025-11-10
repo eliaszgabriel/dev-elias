@@ -1,12 +1,11 @@
 // src/data/projects.js
 // Dados dos projetos exibidos no grid de "Projetos".
-// Mantenha descritivo e conciso; imagens/links podem ser adicionados depois.
 
 export const projects = [
   {
     id: "pf-recrutamento",
-    title: "PF Recrutamento — Ecosistema (API + Bot + Site)",
-    desc: "Automação completa de recrutamento com sincronização de cargos, histórico, painel e API pública.",
+    title: "PF Recrutamento — Ecossistema (API + Bot + Site)",
+    desc: "Automação completa de recrutamento com sync de cargos, histórico, painel e API pública.",
     badges: ["Node.js", "Discord.js", "Express", "SQLite"],
     stats: { users: "1k+", servers: "1", uptime: "24/7" },
     href: "#",
@@ -22,28 +21,25 @@ export const projects = [
   {
     id: "shield-hierarquia",
     title: "Shield — Bot de Hierarquia & Tickets",
-    desc: "Set automático de patentes de praças, tickets com permissões dinâmicas, staff lock e logs.",
+    desc: "Patentes automáticas (praças), tickets com permissões dinâmicas, staff lock e logs.",
     badges: ["Discord.js", "Perms avançadas", "PM2"],
     stats: { tickets: "500+", staff: "ágil", erros: "0 críticos" },
     href: "#",
   },
-
-  // ======== Novos projetos ========
-
   {
-    id: "gestao-financeira",
-    title: "Gestão Financeira — Dashboard & Automação",
-    desc: "Controle de receitas/despesas, categorias, relatórios mensais e automações de fechamento com export (CSV/JSON).",
-    badges: ["React", "Node.js", "SQLite", "Cron"],
-    stats: { meses: "12+", relatorios: "mensais", automacoes: "fechamento" },
+    id: "gestao-financas",
+    title: "Gestão de Finanças — Dashboard & Automação",
+    desc: "Controle de entradas/saídas, metas, categorias e relatórios com automações (import CSV).",
+    badges: ["React", "Node", "SQLite", "Cron"],
+    stats: { meses: "12+", metas: "on track", relatórios: "PDF/CSV" },
     href: "#",
   },
   {
-    id: "vacinas-cpp",
-    title: "Vacinas — Sistema Acadêmico em C++",
-    desc: "Cadastro de pessoas e vacinas, consulta por modelo/lote, persistência em banco de dados e relatórios básicos.",
-    badges: ["C++", "CLI", "CRUD", "SQLite/Arquivos"],
-    stats: { registros: "100+", consultas: "instant", modo: "offline" },
+    id: "sistema-vacinas-cpp",
+    title: "Sistema de Vacinas (C++) — Trabalho Acadêmico",
+    desc: "Cadastro de vacinas, pessoas e carteiras; busca/consulta por nome, modelo e lote.",
+    badges: ["C++", "Arquivos/DB", "CLI"],
+    stats: { registros: "500+", consistência: "alta" },
     href: "#",
   },
 ];

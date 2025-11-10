@@ -1,9 +1,10 @@
 // src/data/skills.js
-// Agrupamento para a seção Skills.
+// Grupos de skills exibidos na seção "Skills & Stack".
+
 export const skills = [
   {
-    title: "Fundamentos",
-    items: ["HTML5", "CSS3", "JavaScript", "TypeScript"],
+    title: "Linguagens",
+    items: ["JavaScript", "TypeScript", "C++", "SQL"],
   },
   {
     title: "Frontend",
@@ -11,18 +12,18 @@ export const skills = [
   },
   {
     title: "Backend",
-    items: ["Node.js", "Express", "SQLite", "Prisma (básico)"],
+    items: ["Node.js", "Express", "Discord.js", "Telegraf"],
   },
   {
-    title: "Bots & Automação",
-    items: ["Discord.js", "Telegraf", "Cron", "PM2"],
+    title: "Banco de Dados",
+    items: ["SQLite", "Better-SQLite3"],
   },
   {
     title: "DevOps/Infra",
-    items: ["Vercel", "Nginx", "Docker (básico)"],
+    items: ["Vercel", "PM2", "Linux", "Nginx"],
   },
   {
     title: "Ferramentas",
-    items: ["Git/GitHub", "Figma", "Postman", "Insomnia"],
+    items: ["Git", "GitHub", "Postman", "Figma"],
   },
 ];
