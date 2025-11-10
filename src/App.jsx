@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { projects } from "@/data/projects";
 import { skills } from "@/data/skills";
 import { createPortal } from "react-dom";
+import { Analytics } from "@vercel/analytics/next";
 // =============== Variants (fade-up + stagger) ===============
 const fadeUp = {
   hidden: { opacity: 0, y: 20, filter: "blur(6px)" },
