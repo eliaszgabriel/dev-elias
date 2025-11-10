@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { projects } from "@/data/projects";
 import { skills } from "@/data/skills";
+import { createPortal } from "react-dom";
 // =============== Variants (fade-up + stagger) ===============
 const fadeUp = {
   hidden: { opacity: 0, y: 20, filter: "blur(6px)" },
@@ -62,13 +63,31 @@ function useScrollY() {
 // =============== Hook: travar o scroll do body quando o menu abre ===============
 function useBodyLock(locked) {
   useEffect(() => {
+    const html = document.documentElement;
     const body = document.body;
-    if (!body) return;
-    const prev = body.style.overflow;
-    if (locked) body.style.overflow = "hidden";
-    else body.style.overflow = prev || "";
+
+    const prevHtmlOverflow = html.style.overflow;
+    const prevHtmlOverscroll = html.style.overscrollBehavior;
+    const prevBodyOverflow = body.style.overflow;
+    const prevBodyTouch = body.style.touchAction;
+
+    if (locked) {
+      // desativa rolagem e “elastic scroll” no iOS/Android
+      html.style.overflow = "hidden";
+      html.style.overscrollBehavior = "none";
+      body.style.overflow = "hidden";
+      body.style.touchAction = "none";
+    } else {
+      html.style.overflow = prevHtmlOverflow || "";
+      html.style.overscrollBehavior = prevHtmlOverscroll || "";
+      body.style.overflow = prevBodyOverflow || "";
+      body.style.touchAction = prevBodyTouch || "";
+    }
     return () => {
-      body.style.overflow = prev || "";
+      html.style.overflow = prevHtmlOverflow || "";
+      html.style.overscrollBehavior = prevHtmlOverscroll || "";
+      body.style.overflow = prevBodyOverflow || "";
+      body.style.touchAction = prevBodyTouch || "";
     };
   }, [locked]);
 }
@@ -80,11 +99,11 @@ function useBodyLock(locked) {
 export default function App() {
   // observa as seções para destacar no menu
   const active = useActiveSection(["projetos", "skills", "sobre", "contato"]);
-  1;
+
   const y = useScrollY();
 
   return (
-    <div className="min-h-screen w-full bg-black text-zinc-100 antialiased overflow-hidden relative scroll-smooth">
+    <div className="min-h-screen w-full max-w-[100vw] bg-black text-zinc-100 antialiased overflow-x-clip relative scroll-smooth">
       <TechLinesBackground />
       <Header active={active} />
 
@@ -152,7 +171,7 @@ function Header({ active }) {
   }
 
   return (
-    <header className="sticky top-0 z-20 w-full bg-black/30 backdrop-blur supports-[backdrop-filter]:bg-black/30 border-b border-white/5">
+    <header className="fixed top-0 left-0 z-40 w-full bg-black/30 backdrop-blur supports-[backdrop-filter]:bg-black/30 border-b border-white/5">
       <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <LogoMark />
@@ -209,15 +228,8 @@ function Header({ active }) {
         >
           Projetos
         </a>
-        <a
-          href="#skills"
-          onClick={closeAndScroll}
-          className={`block px-5 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition ${
-            active === "skills" ? "text-white" : "text-zinc-300"
-          }`}
-        >
-          Skills
-        </a>
+
+        {/* Removido o link de Skills */}
 
         <a
           href="#sobre"
@@ -228,6 +240,7 @@ function Header({ active }) {
         >
           Sobre
         </a>
+
         <a
           href="#contato"
           onClick={closeAndScroll}
@@ -244,9 +257,10 @@ function Header({ active }) {
 
 /* ======================= Mobile Menu ======================= */
 function MobileMenu({ open, onClose, children }) {
+  // trava o scroll do body quando aberto
   useBodyLock(open);
 
-  // fecha com ESC e clique fora
+  // ESC fecha
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => e.key === "Escape" && onClose();
@@ -254,67 +268,71 @@ function MobileMenu({ open, onClose, children }) {
     return () => document.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          aria-hidden={!open}
-          className="md:hidden fixed inset-0 z-30"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          {/* Backdrop */}
-          <motion.button
-            onClick={onClose}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+  if (!open) return null;
+
+  // RENDERIZA NO BODY (portal) — foge do header e da pilha atual
+  return createPortal(
+    <>
+      {/* Backdrop */}
+      <motion.button
+        type="button"
+        aria-label="Fechar menu"
+        onClick={onClose}
+        className="fixed inset-0 z-[80] bg-black/70 backdrop-blur-sm"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      />
+
+      {/* Drawer lateral (não cobre a tela toda) */}
+      <motion.aside
+        role="dialog"
+        aria-modal="true"
+        id="mobile-drawer"
+        className="
+          fixed top-0 right-0 z-[81]
+          w-[72%] sm:w-[60%] md:w-[45%]
+          bg-zinc-950/95 border-l border-white/10 rounded-l-2xl
+          pt-[calc(env(safe-area-inset-top,0px)+16px)] pb-6 px-5
+          flex flex-col gap-3
+          overflow-y-auto overscroll-contain
+        "
+        initial={{ x: "100%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "100%" }}
+        transition={{ type: "spring", stiffness: 180, damping: 22 }}
+      >
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <LogoMark />
+            <span className="text-sm font-semibold tracking-[0.22em] text-zinc-200">
+              MENU
+            </span>
+          </div>
+          <button
             aria-label="Fechar menu"
-          />
-
-          {/* Drawer */}
-          <motion.div
-            id="mobile-drawer"
-            role="dialog"
-            aria-modal="true"
-            className="absolute right-0 top-0 h-full w-[78%] max-w-xs bg-zinc-950/95 border-l border-white/10 p-5 flex flex-col gap-3"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "tween", duration: 0.28 }}
+            onClick={onClose}
+            className="h-9 w-9 grid place-items-center rounded-lg border border-white/10 text-zinc-300 hover:bg-white/5"
           >
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <LogoMark />
-                <span className="text-sm font-semibold tracking-[0.22em] text-zinc-200">MENU</span>
-              </div>
-              <button
-                aria-label="Fechar menu"
-                onClick={onClose}
-                className="h-9 w-9 grid place-items-center rounded-lg border border-white/10 text-zinc-300 hover:bg-white/5"
-              >
-                <svg viewBox="0 0 24 24" className="h-5 w-5">
-                  <path
-                    d="M6 6l12 12M18 6l-12 12"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </button>
-            </div>
+            <svg viewBox="0 0 24 24" className="h-5 w-5">
+              <path
+                d="M6 6l12 12M18 6l-12 12"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        </div>
 
-            <div className="mt-2 flex flex-col gap-2">{children}</div>
+        <div className="mt-2 flex flex-col gap-2">{children}</div>
 
-            <div className="mt-auto pt-4 text-[11px] text-zinc-500">
-              © {new Date().getFullYear()} Elias Gabriel
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        <div className="mt-auto pt-4 text-[11px] text-zinc-500">
+          © {new Date().getFullYear()} Elias Gabriel
+        </div>
+      </motion.aside>
+    </>,
+    document.body
   );
 }
 
@@ -339,7 +357,10 @@ function Hero() {
         ELIAS GABRIEL
       </motion.h1>
 
-      <motion.p variants={fadeUp} className="mt-4 text-zinc-300 text-lg md:text-xl">
+      <motion.p
+        variants={fadeUp}
+        className="mt-4 text-zinc-300 text-lg md:text-xl"
+      >
         UI & Software Builder
       </motion.p>
 
@@ -350,7 +371,10 @@ function Hero() {
         Construindo soluções digitais com eficiência e visão.
       </motion.p>
 
-      <motion.div variants={fadeUp} className="mt-10 flex items-center justify-center gap-4">
+      <motion.div
+        variants={fadeUp}
+        className="mt-10 flex items-center justify-center gap-4"
+      >
         <GlassButton href="#projetos" label="Ver Projetos" />
         <NeonOutlineButton href="#contato" label="Contato" />
       </motion.div>
@@ -358,10 +382,7 @@ function Hero() {
       <motion.div
         variants={fadeUp}
         className="mt-14 flex items-center justify-center gap-2 text-xs text-zinc-400"
-      >
-        <span>role para ver mais</span>
-        <div className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
-      </motion.div>
+      ></motion.div>
     </motion.section>
   );
 }
@@ -378,9 +399,8 @@ function SectionDivider() {
 
 /* ======================= Skills / Stack ======================= */
 function SkillsSection() {
-  const [active, setActive] = useState("Todas");
+  // Chips estáticos (não clicáveis) e todas as categorias sempre visíveis
   const categories = ["Todas", ...skills.map((g) => g.title)];
-  const visible = active === "Todas" ? skills : skills.filter((g) => g.title === active);
 
   return (
     <motion.section
@@ -400,51 +420,42 @@ function SkillsSection() {
 
       <div className="mx-auto max-w-6xl px-6">
         <motion.div variants={fadeUp} className="text-center">
-          <div className="text-cyan-300/80 text-xs tracking-[0.28em] uppercase">SKILLS & STACK</div>
+          <div className="text-cyan-300/80 text-xs tracking-[0.28em] uppercase">
+            SKILLS & STACK
+          </div>
           <h2 className="mt-2 text-2xl md:text-4xl font-semibold text-zinc-100">
             Ferramentas que uso no dia a dia.
           </h2>
           <p className="mt-3 text-zinc-400 max-w-2xl mx-auto">
-            Foco em entregar rápido, com código limpo e microinterações que fazem diferença.
+            Foco em entregar rápido, com código limpo e microinterações que
+            fazem diferença.
           </p>
         </motion.div>
 
-        {/* filtros */}
+        {/* chips apenas visuais (sem onClick) */}
         <motion.div
           variants={fadeUp}
           className="mt-8 flex flex-wrap items-center justify-center gap-2"
-          role="tablist"
-          aria-label="Filtrar categorias de skills"
+          aria-label="Categorias de skills"
         >
-          {categories.map((name) => {
-            const selected = active === name;
-            return (
-              <button
-                key={name}
-                role="tab"
-                aria-selected={selected}
-                aria-pressed={selected}
-                onClick={() => setActive(name)}
-                className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs border transition ${
-                  selected
-                    ? "bg-cyan-500/15 border-cyan-400/40 text-cyan-200"
-                    : "bg-white/5 border-white/10 text-zinc-300 hover:bg-white/10"
-                }`}
-              >
-                <span
-                  className={`h-1.5 w-1.5 rounded-full ${
-                    selected ? "bg-cyan-400" : "bg-zinc-400/70"
-                  }`}
-                />
-                {name}
-              </button>
-            );
-          })}
+          {categories.map((name) => (
+            <span
+              key={name}
+              className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs border 
+                         bg-white/5 border-white/10 text-zinc-300"
+            >
+              <span
+                className="h-1.5 w-1.5 rounded-full bg-cyan-400/70"
+                aria-hidden
+              />
+              {name}
+            </span>
+          ))}
         </motion.div>
 
-        {/* grid de categorias visíveis */}
+        {/* TODAS as categorias visíveis sempre */}
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {visible.map((group, idx) => (
+          {skills.map((group, idx) => (
             <SkillCategory key={group.title} group={group} index={idx} />
           ))}
         </div>
@@ -506,7 +517,10 @@ function SkillPill({ label }) {
 /* ===================== Projetos ======================= */
 function ProjectsSection() {
   return (
-    <section id="projetos" className="relative z-10 py-20 md:py-28 scroll-mt-24 md:scroll-mt-32">
+    <section
+      id="projetos"
+      className="relative z-10 py-20 md:py-28 scroll-mt-24 md:scroll-mt-32"
+    >
       {/* veil para contraste */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="h-full w-full bg-black/20 backdrop-blur-[1px]" />
@@ -543,8 +557,12 @@ function ProjectsSection() {
 function SectionHeader({ kicker, title, subtitle }) {
   return (
     <div className="text-center">
-      <div className="text-cyan-300/80 text-xs tracking-[0.28em] uppercase">{kicker}</div>
-      <h2 className="mt-2 text-2xl md:text-4xl font-semibold text-zinc-100">{title}</h2>
+      <div className="text-cyan-300/80 text-xs tracking-[0.28em] uppercase">
+        {kicker}
+      </div>
+      <h2 className="mt-2 text-2xl md:text-4xl font-semibold text-zinc-100">
+        {title}
+      </h2>
       <p className="mt-3 text-zinc-400 max-w-2xl mx-auto">{subtitle}</p>
     </div>
   );
@@ -596,7 +614,9 @@ function ProjectCard({ project, index }) {
           {stats?.servers && <Stat label="Servidores" value={stats.servers} />}
           {stats?.uptime && <Stat label="Uptime" value={stats.uptime} />}
           {stats?.vendas && <Stat label="Vendas" value={stats.vendas} />}
-          {stats?.aprovacoes && <Stat label="Aprovações" value={stats.aprovacoes} />}
+          {stats?.aprovacoes && (
+            <Stat label="Aprovações" value={stats.aprovacoes} />
+          )}
           {stats?.convites && <Stat label="Convites" value={stats.convites} />}
           {stats?.staff && <Stat label="Staff" value={stats.staff} />}
           {stats?.erros && <Stat label="Erros" value={stats.erros} />}
@@ -631,13 +651,19 @@ function AboutSection() {
       variants={stagger}
     >
       <div className="mx-auto max-w-4xl px-6 text-center">
-        <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-semibold text-zinc-100">
+        <motion.h2
+          variants={fadeUp}
+          className="text-3xl md:text-5xl font-semibold text-zinc-100"
+        >
           Sobre mim
         </motion.h2>
-        <motion.p variants={fadeUp} className="mt-4 text-zinc-400 leading-relaxed">
-          Dev focado em automação e UX. Entrego sistemas enxutos, bem pensados e fáceis de operar.
-          Stack favorita: Node/Express/Discord.js/SQLite no back; UI clean com microinterações no
-          front.
+        <motion.p
+          variants={fadeUp}
+          className="mt-4 text-zinc-400 leading-relaxed"
+        >
+          Dev focado em automação e UX. Entrego sistemas enxutos, bem pensados e
+          fáceis de operar. Stack favorita: Node/Express/Discord.js/SQLite no
+          back; UI clean com microinterações no front.
         </motion.p>
       </div>
     </motion.section>
@@ -656,12 +682,16 @@ function ContactSection() {
       variants={stagger}
     >
       <div className="mx-auto max-w-3xl px-6 text-center">
-        <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-semibold text-zinc-100">
+        <motion.h2
+          variants={fadeUp}
+          className="text-3xl md:text-5xl font-semibold text-zinc-100"
+        >
           Contato
         </motion.h2>
 
         <motion.p variants={fadeUp} className="mt-4 text-zinc-400">
-          Quer lançar algo comigo? Me chama e a gente desenha a solução certa pro seu caso.
+          Quer lançar algo comigo? Me chama e a gente desenha a solução certa
+          pro seu caso.
         </motion.p>
 
         <motion.div
@@ -813,7 +843,8 @@ function Footer() {
   return (
     <footer className="relative z-10">
       <div className="mx-auto max-w-7xl px-6 py-16 text-center text-xs text-zinc-500">
-        © {new Date().getFullYear()} Elias Gabriel — feito com foco, café e código.
+        © {new Date().getFullYear()} Elias Gabriel — feito com foco, café e
+        código.
       </div>
     </footer>
   );
@@ -825,7 +856,11 @@ function LogoMark() {
     <div className="relative h-6 w-6 grid place-items-center">
       <span className="absolute inset-0 rounded-lg bg-cyan-500/20 blur" />
       <svg viewBox="0 0 24 24" className="relative h-6 w-6 text-cyan-400">
-        <path d="M4 7.5L12 3l8 4.5v9L12 21l-8-4.5v-9Z" fill="currentColor" opacity="0.15" />
+        <path
+          d="M4 7.5L12 3l8 4.5v9L12 21l-8-4.5v-9Z"
+          fill="currentColor"
+          opacity="0.15"
+        />
         <path
           d="M12 5.5l5.5 3.1v6.8L12 18.5l-5.5-3.1V8.6L12 5.5Z"
           stroke="currentColor"
@@ -863,7 +898,12 @@ function TechLinesBackground() {
   const linesOpacity = prefersReduced ? 0.15 : 0.3;
 
   return (
-    <div ref={ref} aria-hidden className="pointer-events-none absolute inset-0 -z-0">
+    <div
+      ref={ref}
+      aria-hidden
+      className="pointer-events-none absolute inset-0 -z-0 overflow-hidden"
+      style={{ contain: "paint" }}
+    >
       {/* Layer 1: grade sutil */}
       <div
         className="absolute inset-0 opacity-[0.07]"
@@ -871,6 +911,7 @@ function TechLinesBackground() {
           backgroundImage:
             "repeating-linear-gradient(90deg, #6ee7e7 0 1px, transparent 1px 120px), repeating-linear-gradient(0deg, #6ee7e7 0 1px, transparent 1px 120px)",
           transform: gridTransform,
+          willChange: "transform",
         }}
       />
 
@@ -883,6 +924,7 @@ function TechLinesBackground() {
           mixBlendMode: "screen",
           opacity: linesOpacity,
           transform: linesTransform,
+          willChange: "transform",
         }}
       >
         <defs>
