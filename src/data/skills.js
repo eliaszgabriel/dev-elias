@@ -1,29 +1,28 @@
 // src/data/skills.js
-// Categorias e tecnologias exibidas na seção "Skills / Stack".
-
+// Agrupamento para a seção Skills.
 export const skills = [
   {
-    title: "Linguagens",
-    items: ["JavaScript (ES2022+)", "C++", "TypeScript (básico)", "SQL"],
+    title: "Fundamentos",
+    items: ["HTML5", "CSS3", "JavaScript", "TypeScript"],
   },
   {
-    title: "Frontend / UI",
-    items: ["React", "Vite", "Tailwind CSS v4", "Framer Motion"],
+    title: "Frontend",
+    items: ["React", "Vite", "Tailwind CSS", "Framer Motion"],
   },
   {
-    title: "Backend / Bots",
-    items: ["Node.js", "Express", "Discord.js", "Telegraf", "Cron Jobs"],
+    title: "Backend",
+    items: ["Node.js", "Express", "SQLite", "Prisma (básico)"],
   },
   {
-    title: "Banco & Data",
-    items: ["SQLite", "Better-SQLite3"],
+    title: "Bots & Automação",
+    items: ["Discord.js", "Telegraf", "Cron", "PM2"],
   },
   {
-    title: "DevOps / Deploy",
-    items: ["PM2", "Nginx", "Vercel", "Hostinger KVM"],
+    title: "DevOps/Infra",
+    items: ["Vercel", "Nginx", "Docker (básico)"],
   },
   {
     title: "Ferramentas",
-    items: ["Git & GitHub", "ESLint + Prettier", "Postman", "Figma"],
+    items: ["Git/GitHub", "Figma", "Postman", "Insomnia"],
   },
 ];

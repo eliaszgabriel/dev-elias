@@ -1,4 +1,7 @@
 // src/data/projects.js
+// Dados dos projetos exibidos no grid de "Projetos".
+// Mantenha descritivo e conciso; imagens/links podem ser adicionados depois.
+
 export const projects = [
   {
     id: "pf-recrutamento",
@@ -24,20 +27,23 @@ export const projects = [
     stats: { tickets: "500+", staff: "ágil", erros: "0 críticos" },
     href: "#",
   },
+
+  // ======== Novos projetos ========
+
   {
-    id: "financas-auto",
-    title: "Gestão de Finanças — Automática",
-    desc: "Painel com importação de extratos (CSV/OFX), categorização por regras, dashboards e alertas automáticos de fluxo de caixa.",
-    badges: ["React", "Node.js", "SQLite", "ETL", "Cron"],
-    stats: { servers: "1", uptime: "24/7", erros: "0 críticos" },
+    id: "gestao-financeira",
+    title: "Gestão Financeira — Dashboard & Automação",
+    desc: "Controle de receitas/despesas, categorias, relatórios mensais e automações de fechamento com export (CSV/JSON).",
+    badges: ["React", "Node.js", "SQLite", "Cron"],
+    stats: { meses: "12+", relatorios: "mensais", automacoes: "fechamento" },
     href: "#",
   },
   {
-    id: "sistema-vacinas",
-    title: "Sistema de Vacinas — C++ (Projeto Acadêmico)",
-    desc: "Aplicação em C++ com cadastro de vacinas, registro de pacientes e controle de doses. Armazena dados em arquivo binário simulando um banco de dados local.",
-    badges: ["C++", "POO", "File System", "CLI"],
-    stats: { registros: "150+", vacinas: "10+", tipo: "Acadêmico" },
+    id: "vacinas-cpp",
+    title: "Vacinas — Sistema Acadêmico em C++",
+    desc: "Cadastro de pessoas e vacinas, consulta por modelo/lote, persistência em banco de dados e relatórios básicos.",
+    badges: ["C++", "CLI", "CRUD", "SQLite/Arquivos"],
+    stats: { registros: "100+", consultas: "instant", modo: "offline" },
     href: "#",
   },
 ];
