@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { projects } from "@/data/projects";
 import { skills } from "@/data/skills";
 import { createPortal } from "react-dom";
+import GlobalBackgrounds from "@/components/GlobalBackgrounds";
 
 // =============== Variants (fade-up + stagger) ===============
 const fadeUp = {
@@ -105,26 +106,25 @@ export default function App() {
 
   return (
     <div className="min-h-screen w-full max-w-[100vw] bg-black text-zinc-100 antialiased overflow-x-clip relative scroll-smooth">
-      <TechLinesBackground />
+      {/* Renderiza fundos globais (portal fixo atrás do site) */}
+      <GlobalBackgrounds />
+      <div
+        className="fixed inset-0 -z-[5] pointer-events-none
+  bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.25)_0%,rgba(0,0,0,0.6)_60%,rgba(0,0,0,0.9)_100%)]
+  backdrop-blur-[3px]"
+      />
+      {/* Agora o conteúdo normal, fora de qualquer pointer-events-none */}
       <Header active={active} />
 
       <main className="relative z-10 px-6 pt-24 pb-16 md:pt-32">
-        {/* HERO */}
         <div className="flex items-center justify-center">
           <Hero />
         </div>
 
-        {/* DIVISÃO */}
         <SectionDivider />
-
-        {/* PROJETOS */}
         <ProjectsSection />
         <SkillsSection />
-
-        {/* SOBRE */}
         <AboutSection />
-
-        {/* CONTATO */}
         <ContactSection />
       </main>
 
@@ -244,9 +244,8 @@ function Header({ active }) {
 
         <a
           href="#contato"
-          onClick={closeAndScroll}
           className={`block px-5 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition ${
-            active === "contato" ? "text-white" : "text-zinc-300"
+            active === "sobre" ? "text-white" : "text-zinc-300"
           }`}
         >
           Contato
@@ -639,7 +638,6 @@ function Stat({ label, value }) {
     </span>
   );
 }
-
 /* ======================== Sobre ======================= */
 function AboutSection() {
   return (
@@ -651,6 +649,9 @@ function AboutSection() {
       viewport={{ once: true, amount: 0.3 }}
       variants={stagger}
     >
+      {/* véu de leitura */}
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/30 to-black/70 backdrop-blur-[2px]" />
+
       <div className="mx-auto max-w-4xl px-6 text-center">
         <motion.h2
           variants={fadeUp}
@@ -660,11 +661,12 @@ function AboutSection() {
         </motion.h2>
         <motion.p
           variants={fadeUp}
-          className="mt-4 text-zinc-400 leading-relaxed"
+          className="mt-4 text-zinc-300 leading-relaxed"
         >
           Dev focado em automação e UX. Entrego sistemas enxutos, bem pensados e
-          fáceis de operar. Stack favorita: Node/Express/Discord.js/SQLite no
-          back; UI clean com microinterações no front.
+          fáceis de operar. Stack favorita:{" "}
+          <span className="text-cyan-300">Node/Express/Discord.js/SQLite</span>{" "}
+          no back; UI clean com microinterações no front.
         </motion.p>
       </div>
     </motion.section>
@@ -682,6 +684,9 @@ function ContactSection() {
       viewport={{ once: true, amount: 0.3 }}
       variants={stagger}
     >
+      {/* véu de leitura */}
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/30 to-black/70 backdrop-blur-[2px]" />
+
       <div className="mx-auto max-w-3xl px-6 text-center">
         <motion.h2
           variants={fadeUp}
@@ -690,11 +695,15 @@ function ContactSection() {
           Contato
         </motion.h2>
 
-        <motion.p variants={fadeUp} className="mt-4 text-zinc-400">
+        <motion.p
+          variants={fadeUp}
+          className="mt-4 text-zinc-300 leading-relaxed"
+        >
           Quer lançar algo comigo? Me chama e a gente desenha a solução certa
           pro seu caso.
         </motion.p>
 
+        {/* mantém os botões de contato */}
         <motion.div
           variants={fadeUp}
           className="mt-10 flex items-center justify-center gap-4 md:gap-6 flex-wrap"
@@ -801,10 +810,22 @@ function NeonOutlineButton({ href, label }) {
   return (
     <a
       href={href}
-      className="group relative inline-flex items-center justify-center rounded-2xl px-6 py-3 text-sm font-semibold text-cyan-300"
+      className="
+        relative inline-flex items-center justify-center
+        px-6 py-3 rounded-2xl
+        text-[#8BE3F2] font-semibold tracking-wide
+        bg-black/70 border border-black/70
+        shadow-[inset_0_0_12px_rgba(139,227,242,0.08)]
+        hover:shadow-[0_0_18px_rgba(139,227,242,0.25),inset_0_0_10px_rgba(139,227,242,0.15)]
+        hover:border-[#8BE3F2]/40
+        hover:scale-[1.04]
+        transition-all duration-300 ease-out
+        transform-gpu
+      "
     >
-      <span className="absolute inset-0 rounded-2xl [mask:linear-gradient(#000_0_0)_content-box,linear-gradient(#000_0_0)] [mask-composite:exclude] p-[1px] bg-[conic-gradient(from_0deg,theme(colors.cyan.500),theme(colors.cyan.300),theme(colors.cyan.500))] animate-[spin_6s_linear_infinite]" />
-      <span className="relative rounded-2xl bg-black px-6 py-3">{label}</span>
+      <span className="animate-[color-blink_2.2s_ease-in-out_infinite]">
+        {label}
+      </span>
     </a>
   );
 }
@@ -902,7 +923,7 @@ function TechLinesBackground() {
     <div
       ref={ref}
       aria-hidden
-      className="pointer-events-none absolute inset-0 -z-0 overflow-hidden"
+      className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
       style={{ contain: "paint" }}
     >
       {/* Layer 1: grade sutil */}
