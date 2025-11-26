@@ -1,17 +1,5 @@
 import { useEffect, useRef } from "react";
 
-/**
- * Fundo nebuloso com “blobs” de cor que se movem lentamente.
- * Transparente por padrão (não tampa seu conteúdo).
- *
- * Props:
- * - blobs:        quantidade de blobs (default 6)
- * - maxRadius:    raio máximo em px (default 420)
- * - speed:        velocidade de drift (0.02 ~ 0.1 recomendado)
- * - hueBase:      matiz base (ex.: 195 ~ ciano)
- * - alpha:        opacidade máxima de cada blob (0.04 ~ 0.16)
- * - className:    classes extras (opcional)
- */
 export function GalaxyNebulaBackground({
   blobs = 6,
   maxRadius = 420,

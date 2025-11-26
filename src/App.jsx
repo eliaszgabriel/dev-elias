@@ -740,7 +740,7 @@ function ContactSection() {
 
           {/* WhatsApp */}
           <a
-            href="https://wa.me/5541996828242?text=Oi%20Elias!%20Vim%20do%20site%20e%20quero%20falar%20sobre%20um%20projeto."
+            href="https://wa.me/5541996822242?text=Oi%20Elias!%20Vim%20do%20site%20e%20quero%20falar%20sobre%20um%20projeto."
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Abrir conversa no WhatsApp"
